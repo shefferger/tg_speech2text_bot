@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Table, Boolean
+from sqlalchemy import Column, Integer, ForeignKey, Table, Boolean, String
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -26,6 +26,9 @@ class User(Base):
     messages_decoded = Column(Integer)
     chats = relationship('Chat', backref=backref('user'))
 
+
 class Locale(Base):
     __tablename__ = 'locale'
-
+    text_meta = Column(String, primary_key=True)
+    lang = Column(String)
+    text = Column(String)

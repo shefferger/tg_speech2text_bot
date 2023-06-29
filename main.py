@@ -3,29 +3,16 @@ import os
 from telebot import async_telebot, types
 import asyncio
 
-locale = dict(
-    en=dict(
-        STATUS='Currently bot is ',
-        ENABLED='ENABLED',
-        DISABLED='DISABLED',
-        ON='Toggle ON',
-        OFF='Toggle OFF',
-    ),
-    ru=dict(
-        STATUS='Сейчас бот ',
-        ENABLED='ВКЛЮЧЕН',
-        DISABLED='ОТКЛЮЧЕН',
-        ON='Включить',
-        OFF='Выключить',
-    )
-)
-
 
 class App:
     def __init__(self):
         self.bot = async_telebot.AsyncTeleBot(os.getenv('TOKEN'))
         self.register_hanlders()
         asyncio.run(self.bot.polling())
+
+    @staticmethod
+    def getlocale(meta_text: str) -> str:
+        return ''
 
     def register_hanlders(self):
         @self.bot.message_handler(commands=['help', 'start', 'status'])
