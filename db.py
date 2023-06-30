@@ -77,8 +77,3 @@ class Db:
                 Db.set_status(chat_id=chat_id, is_enabled=False)
             return dict(is_enabled=data[0].is_enabled, msgs_decoded=data[0].msgs_decoded)\
                 if data else dict(is_enabled=False, msgs_decoded=0)
-
-    @staticmethod
-    def select_data():
-        with Db.get_session_rw() as session:
-            pass
