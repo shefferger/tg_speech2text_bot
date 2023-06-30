@@ -5,7 +5,7 @@ from db import Db
 def gen_locales():
     locale = {
         'bot_status': {
-            'ru': 'Сейчас бот',
+            'ru': 'Сейчас бот ',
             'en': 'Currently bot is '
         },
         'enabled': {
@@ -25,7 +25,9 @@ def gen_locales():
             'en': 'Toggle OFF'
         }
     }
-    # TO DO: добавить инсерт/апдейт в базу
+    for text_meta, langpack in locale.items():
+        for lang, text in langpack.items():
+            Db.update_locale(text_meta=text_meta, lang=lang, text=text)
 
 
 if __name__ == '__main__':
