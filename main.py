@@ -13,6 +13,9 @@ import speech2text
 class App:
     def __init__(self):
         signal.signal(signal.SIGINT, self.exit_handler)
+        if not os.getenv('TOKEN'):
+            print('Token not presented, exiting')
+            return
         self.bot = async_telebot.AsyncTeleBot(os.getenv('TOKEN'))
         self.register_hanlders()
         self.db = db.Db()
@@ -49,7 +52,6 @@ class App:
                                   msg.reply_to_message.content_type == 'voice')
         async def voice_message_handler(msg):
             cid = msg.chat.id
-            uid = msg.reply_to_message.from_user.id
             status = self.db.get_status(cid)
             is_enabled = status['is_enabled']
             if not is_enabled:
@@ -68,7 +70,7 @@ class App:
             with memoryfs.MemoryFS() as memfs:
                 filename_wav = speech2text.convert_ogg2wav(filename_ogg, memfs, downloaded_file)
                 text = speech2text.transcribe(filename=filename_wav, filesystem=memfs, lang=lang)
-            await self.bot.send_message(chat_id=cid, text=text)
+            await self.bot.reply_to(message=msg.reply_to_message, text=text)
 
         @self.bot.callback_query_handler(func=lambda call: call.data[:3] == 'bot')
         async def callback_handler(call):

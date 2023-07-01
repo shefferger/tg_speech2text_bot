@@ -8,8 +8,11 @@ recognizer = sr.Recognizer()
 
 def transcribe(filename: str, filesystem: fs.opener, lang: str) -> str:
     """
-    Gets a file with voice for transcribing
+    Transcribing audio from file
 
+    :param filename: Name of file
+    :param filesystem: Filesystem (e.g. memoryFS)
+    :param lang: Language (en/ru)
     :return: Transcribed text string
     """
     with filesystem.open(path=filename, mode='rb') as file:
@@ -25,6 +28,7 @@ def transcribe(filename: str, filesystem: fs.opener, lang: str) -> str:
 
 def convert_ogg2wav(filename_ogg: str, filesystem: fs.opener, file) -> str:
     """
+    Audio converter
 
     :param filename_ogg: Filename in OGG format
     :param filesystem: FS
