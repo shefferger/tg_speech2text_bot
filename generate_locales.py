@@ -23,6 +23,10 @@ def gen_locales():
         'toggle_off': {
             'ru': 'Отключить',
             'en': 'Toggle OFF'
+        },
+        'lang': {
+            'ru': 'Язык: Русский',
+            'en': 'Language: English'
         }
     }
     for text_meta, langpack in locale.items():

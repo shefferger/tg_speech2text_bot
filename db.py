@@ -1,7 +1,8 @@
 import os
 import sqlite3
 from contextlib import contextmanager
-from sqlalchemy import create_engine, orm, select, insert, update
+import sqlalchemy.util
+from sqlalchemy import create_engine, orm, insert, update
 import models
 
 
@@ -43,37 +44,47 @@ class Db:
                 session.commit()
         elif data != text:
             with Db.get_session_rw() as session:
-                query = update(models.Locale).where(models.Locale.text_meta == f'{text_meta}_{lang}').\
-                    values(text=text)
-                session.execute(query)
+                session.query(models.Locale).filter_by(text_meta=f'{text_meta}_{lang}').update(dict(text=text))
                 session.commit()
         return text
 
     @staticmethod
     def get_locale(text_meta: str, lang: str) -> str:
         with Db.get_session_rw() as session:
-            query = select(models.Locale).where(models.Locale.text_meta == f'{text_meta}_{lang}')
-            data = session.execute(query).first()
-            return data[0].text if data else None
+            data = session.query(models.Locale).filter_by(text_meta=f'{text_meta}_{lang}').first()
+            return data.text if data else None
 
     @staticmethod
-    def set_status(chat_id: int, is_enabled: bool):
+    def set_status(chat_id: int, is_enabled: bool, lang: str):
         with Db.get_session_rw() as session:
             if session.query(models.Chat).filter_by(chat_id=chat_id).first():
-                session.query(models.Chat).filter_by(chat_id=chat_id).update(dict(is_enabled=is_enabled))
+                session.query(models.Chat).filter_by(chat_id=chat_id).update(dict(is_enabled=is_enabled,
+                                                                                  lang=lang))
             else:
                 query = insert(models.Chat).values(chat_id=chat_id,
                                                    is_enabled=is_enabled,
-                                                   msgs_decoded=0)
+                                                   msgs_decoded=0,
+                                                   lang=lang)
                 session.execute(query)
             session.commit()
 
     @staticmethod
     def get_status(chat_id: int) -> dict:
         with Db.get_session_rw() as session:
-            query = select(models.Chat).where(models.Chat.chat_id == chat_id)
-            data = session.execute(query).first()
-            if not data:
-                Db.set_status(chat_id=chat_id, is_enabled=False)
-            return dict(is_enabled=data[0].is_enabled, msgs_decoded=data[0].msgs_decoded)\
-                if data else dict(is_enabled=False, msgs_decoded=0)
+            data = session.query(models.Chat).filter_by(chat_id=chat_id).first()
+            if data is sqlalchemy.util.NoneType:
+                Db.set_status(chat_id=chat_id, is_enabled=False, lang='en')
+            return dict(is_enabled=data.is_enabled, msgs_decoded=data.msgs_decoded, lang=data.lang)\
+                if data else dict(is_enabled=False, msgs_decoded=0, lang=None)
+
+    @staticmethod
+    def set_user(chat_id: int, user_id: int, lang: str):
+        pass
+
+    @staticmethod
+    def get_user() -> dict:
+        pass
+
+    @staticmethod
+    def decode_msg(chat_id: int, user_id: int):
+        pass
