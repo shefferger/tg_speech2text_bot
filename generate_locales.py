@@ -31,7 +31,7 @@ def gen_locales():
     }
     for text_meta, langpack in locale.items():
         for lang, text in langpack.items():
-            Db.update_locale(text_meta=text_meta, lang=lang, text=text)
+            await Db.update_locale(text_meta=text_meta, lang=lang, text=text)
 
 
 if __name__ == '__main__':

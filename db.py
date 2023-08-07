@@ -35,7 +35,7 @@ class Db:
                 session.rollback()
 
     @staticmethod
-    def update_locale(text_meta: str, lang: str, text: str) -> str:
+    async def update_locale(text_meta: str, lang: str, text: str) -> str:
         data = Db.get_locale(text_meta, lang)
         if data is None:
             with Db.get_session_rw() as session:
@@ -49,13 +49,13 @@ class Db:
         return text
 
     @staticmethod
-    def get_locale(text_meta: str, lang: str) -> str:
+    async def get_locale(text_meta: str, lang: str) -> str:
         with Db.get_session_rw() as session:
             data = session.query(models.Locale).filter_by(text_meta=f'{text_meta}_{lang}').first()
             return data.text if data else None
 
     @staticmethod
-    def set_status(chat_id: int, is_enabled: bool, lang: str):
+    async def set_status(chat_id: int, is_enabled: bool, lang: str):
         with Db.get_session_rw() as session:
             if session.query(models.Chat).filter_by(chat_id=chat_id).first():
                 session.query(models.Chat).filter_by(chat_id=chat_id).update(dict(is_enabled=is_enabled,
@@ -69,11 +69,11 @@ class Db:
             session.commit()
 
     @staticmethod
-    def get_status(chat_id: int) -> dict:
+    async def get_status(chat_id: int) -> dict:
         with Db.get_session_rw() as session:
             data = session.query(models.Chat).filter_by(chat_id=chat_id).first()
             if data is sqlalchemy.util.NoneType:
-                Db.set_status(chat_id=chat_id, is_enabled=False, lang='en')
+                await Db.set_status(chat_id=chat_id, is_enabled=False, lang='en')
             return dict(is_enabled=data.is_enabled, msgs_decoded=data.msgs_decoded, lang=data.lang)\
                 if data else dict(is_enabled=False, msgs_decoded=0, lang=None)
 
